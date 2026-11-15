@@ -12,6 +12,7 @@ from custom_components.tuya_local.const import (
     DOMAIN,
 )
 from custom_components.tuya_local.fan import TuyaLocalFan, async_setup_entry
+from custom_components.tuya_local.helpers.device_config import TuyaDeviceConfig
 
 
 @pytest.mark.asyncio
@@ -120,3 +121,26 @@ async def test_init_entry_fails_if_config_is_missing(hass):
     except ValueError:
         pass
     m_add_entities.assert_not_called()
+
+
+def _mapped_speed_fan(dps):
+    """A fan whose speed dp has an explicit value mapping (goldair_dehumidifier: 50 and 100)."""
+    device = Mock()
+    device.get_property.side_effect = lambda dp: dps.get(dp)
+    config = TuyaDeviceConfig("goldair_dehumidifier.yaml")
+    fan_config = next(e for e in config.all_entities() if e.entity == "fan")
+    return TuyaLocalFan(device, fan_config)
+
+
+def test_percentage_step_with_mapped_speeds():
+    """percentage_step counts the mapped speeds (regression: a generator passed to len raised TypeError)."""
+    fan = _mapped_speed_fan({"1": True, "2": "0", "6": "1"})
+    assert fan.percentage_step == 50
+    assert fan.speed_count == 2
+
+
+def test_percentage_step_excludes_zero_from_mapped_speeds():
+    """A mapped speed of 0 (off) is not counted as a step."""
+    fan = _mapped_speed_fan({"1": True, "2": "0", "6": "1"})
+    fan._speed_dps.values = Mock(return_value=[0, 33, 67, 100])
+    assert fan.percentage_step == pytest.approx(100 / 3)
