@@ -1,0 +1,317 @@
+name: Dehumidifier
+products:
+  - id: decb2yyqdlayfu8b
+    manufacturer: Inventor
+    model: Comfort 16L
+entities:
+  - entity: humidifier
+    class: dehumidifier
+    translation_only_key: extended
+    dps:
+      - id: 1
+        type: boolean
+        name: switch
+      - id: 3
+        type: string
+        name: humidity
+        mapping:
+          # "co" is continuous; shown one step below the lowest target,
+          # as in the Inventor Rise Pro profile. It doesn't change DP 5.
+          # Smart and Dry Clothes lock the target (the target then reads
+          # as unknown); the condition sits on every entry because
+          # invalid_for looks up the entry for the value being set.
+          - dps_val: "co"
+            value: 35
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "40"
+            value: 40
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "45"
+            value: 45
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "50"
+            value: 50
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "55"
+            value: 55
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "60"
+            value: 60
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "65"
+            value: 65
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "70"
+            value: 70
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "75"
+            value: 75
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+          - dps_val: "80"
+            value: 80
+            constraint: mode
+            conditions:
+              - dps_val: [smd, dry_clothes]
+                invalid: true
+      - id: 5
+        type: string
+        name: mode
+        mapping:
+          - dps_val: smd
+            value: auto
+          - dps_val: dry_clothes
+            value: laundry
+          - dps_val: sleep_mode
+            value: sleep
+          - dps_val: manual_dehumidify
+            value: normal
+      - id: 6
+        type: integer
+        name: current_humidity
+  - entity: fan
+    dps:
+      - id: 1
+        type: boolean
+        name: switch
+      - id: 4
+        type: string
+        name: speed
+        mapping:
+          - constraint: mode
+            conditions:
+              - dps_val: airpurify
+                value_redirect: purify_speed
+              - dps_val: [dehum_air, dehum30_air]
+                mapping:
+                  - dps_val: low
+                    value: 33
+                  - dps_val: mid
+                    value: 67
+                  - dps_val: high
+                    value: 100
+                  - dps_val: auto
+                    value: null
+                    hidden: true
+      - id: 4
+        type: string
+        name: preset_mode
+        mapping:
+          - dps_val: auto
+            value: auto
+          - dps_val: low
+            value: low
+          - dps_val: mid
+            value: medium
+          - dps_val: high
+            value: high
+      - id: 8
+        type: boolean
+        name: oscillate
+      - id: 103
+        type: string
+        name: purify_speed
+        mapping:
+          - dps_val: high
+            value: 100
+          - dps_val: mid
+            value: 67
+          - dps_val: low
+            value: 33
+      - id: 105
+        type: string
+        name: mode
+        hidden: true
+  - entity: select
+    translation_key: air_mode
+    dps:
+      - id: 105
+        type: string
+        name: option
+        mapping:
+          - dps_val: dehum30_air
+            value: dehumidify
+          - dps_val: airpurify
+            value: purify
+          - dps_val: dehum_air
+            value: dehumidify_and_purify
+  - entity: switch
+    translation_key: sleep
+    category: config
+    dps:
+      # Night mode for the purifier
+      - id: 102
+        type: string
+        name: switch
+        mapping:
+          - dps_val: manual
+            value: false
+          - dps_val: night
+            value: true
+  - entity: switch
+    translation_key: ionizer
+    category: config
+    dps:
+      - id: 10
+        type: boolean
+        name: switch
+  - entity: switch
+    translation_key: uv_sterilization
+    category: config
+    dps:
+      - id: 13
+        type: boolean
+        name: switch
+  - entity: lock
+    translation_key: child_lock
+    category: config
+    dps:
+      - id: 16
+        type: boolean
+        name: lock
+  - entity: switch
+    translation_key: sound
+    category: config
+    dps:
+      # Beeper: true = beeps on
+      - id: 109
+        type: boolean
+        name: switch
+  - entity: switch
+    name: Internal dry
+    icon: "mdi:hair-dryer"
+    category: config
+    dps:
+      - id: 108
+        type: boolean
+        name: switch
+  - entity: select
+    name: Indicators
+    icon: "mdi:led-on"
+    category: config
+    dps:
+      - id: 104
+        type: string
+        name: option
+        mapping:
+          - dps_val: "1"
+            value: "Humidity off"
+          - dps_val: "2"
+            value: "All off"
+          - dps_val: "3"
+            value: "All on"
+  - entity: select
+    translation_key: timer
+    category: config
+    dps:
+      - id: 17
+        type: string
+        name: option
+        mapping:
+          - dps_val: cancel
+            value: cancel
+          - dps_val: "1h"
+            value: "1h"
+          - dps_val: "2h"
+            value: "2h"
+          - dps_val: "3h"
+            value: "3h"
+          - dps_val: "4h"
+            value: "4h"
+          - dps_val: "5h"
+            value: "5h"
+          - dps_val: "6h"
+            value: "6h"
+          - dps_val: "7h"
+            value: "7h"
+          - dps_val: "8h"
+            value: "8h"
+          - dps_val: "9h"
+            value: "9h"
+  - entity: sensor
+    translation_key: time_remaining
+    class: duration
+    category: diagnostic
+    dps:
+      - id: 18
+        type: integer
+        name: sensor
+        unit: min
+  - entity: sensor
+    class: temperature
+    category: diagnostic
+    dps:
+      - id: 7
+        type: integer
+        name: sensor
+        unit: C
+        class: measurement
+  - entity: binary_sensor
+    class: problem
+    category: diagnostic
+    dps:
+      # Bits (LSB first): C1, C2, C8, P1, P2, P3, P4
+      - id: 19
+        type: bitfield
+        name: sensor
+        mapping:
+          - dps_val: 0
+            value: false
+          - value: true
+      - id: 19
+        type: bitfield
+        name: fault_code
+  - entity: binary_sensor
+    name: Humidity high
+    icon: "mdi:water-alert"
+    class: problem
+    category: diagnostic
+    dps:
+      # HI on the display
+      - id: 106
+        type: bitfield
+        name: sensor
+        mapping:
+          - dps_val: 0
+            value: false
+          - value: true
+  - entity: binary_sensor
+    name: Humidity low
+    icon: "mdi:water-alert-outline"
+    class: problem
+    category: diagnostic
+    dps:
+      # LO on the display
+      - id: 107
+        type: bitfield
+        name: sensor
+        mapping:
+          - dps_val: 0
+            value: false
+          - value: true
