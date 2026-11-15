@@ -1,0 +1,124 @@
+name: Dehumidifier
+products:
+  - id: ejpgjggkfud1amsl
+    manufacturer: Inventor
+    model: Sera 16L
+    model_id: SER-WFIA-16L
+entities:
+  - entity: humidifier
+    class: dehumidifier
+    translation_only_key: extended
+    dps:
+      - id: 1
+        type: boolean
+        name: switch
+      - id: 2
+        type: integer
+        name: humidity
+        range:
+          min: 35
+          max: 85
+        mapping:
+          - step: 5
+            # The unit rejects target changes in Dryer/Continuous mode
+            # (echoes the old value). Sleep mode accepts them. While
+            # invalid, the target reads as unknown.
+            constraint: mode
+            conditions:
+              - dps_val: continuous
+                invalid: true
+      - id: 5
+        type: string
+        name: mode
+        mapping:
+          - dps_val: smart_m
+            value: normal
+          - dps_val: continuous
+            value: continuous
+          - dps_val: silent
+            value: sleep
+      - id: 6
+        type: integer
+        name: current_humidity
+  - entity: fan
+    dps:
+      - id: 1
+        type: boolean
+        name: switch
+      - id: 4
+        type: string
+        name: speed
+        mapping:
+          # Sleep forces the fan to low and locks it, but DP 4 keeps
+          # reporting the speed from before, so show low while in sleep.
+          # Not on the low entry: a condition with a value there would
+          # switch the mode to sleep whenever low is set. Not invalid:
+          # that would show the speed as unknown. Continuous forces high
+          # and reports it, so it needs nothing.
+          - dps_val: low
+            value: 33
+          - dps_val: mid
+            value: 66
+            constraint: mode
+            conditions:
+              - dps_val: silent
+                value: 33
+          - dps_val: high
+            value: 100
+            constraint: mode
+            conditions:
+              - dps_val: silent
+                value: 33
+      - id: 105
+        type: boolean
+        name: oscillate
+      - id: 5
+        type: string
+        name: mode
+        hidden: true
+  - entity: switch
+    translation_key: ionizer
+    category: config
+    dps:
+      - id: 10
+        type: boolean
+        name: switch
+  # Removing the tank stops the compressor but reports nothing on DP 25
+  # or DP 19. Not yet seen with a genuinely full tank.
+  - entity: binary_sensor
+    translation_key: tank_full
+    category: diagnostic
+    dps:
+      - id: 25
+        type: string
+        name: sensor
+        mapping:
+          - dps_val: "on"
+            value: true
+          - value: false
+  - entity: binary_sensor
+    name: Filter
+    icon: "mdi:air-filter"
+    category: diagnostic
+    class: problem
+    dps:
+      - id: 103
+        type: boolean
+        name: sensor
+  - entity: binary_sensor
+    class: problem
+    category: diagnostic
+    dps:
+      # Bits (LSB first) carry the cloud labels 10, 11, 38, 37, 1:
+      # presumably the E-codes shown on the display. Removing the tank
+      # sets none of them.
+      - id: 19
+        type: bitfield
+        name: sensor
+        mapping:
+          - dps_val: 0
+            value: false
+          - value: true
+      - id: 19
+        type: bitfield
+        name: fault_code
