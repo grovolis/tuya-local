@@ -14,6 +14,9 @@ entities:
       - id: 3
         type: string
         name: humidity
+        range:
+          min: 35
+          max: 80
         mapping:
           # "co" is continuous; shown one step below the lowest target,
           # as in the Inventor Rise Pro profile. It doesn't change DP 5.
@@ -22,60 +25,70 @@ entities:
           # invalid_for looks up the entry for the value being set.
           - dps_val: "co"
             value: 35
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "40"
             value: 40
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "45"
             value: 45
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "50"
             value: 50
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "55"
             value: 55
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "60"
             value: 60
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "65"
             value: 65
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "70"
             value: 70
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "75"
             value: 75
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
                 invalid: true
           - dps_val: "80"
             value: 80
+            step: 5
             constraint: mode
             conditions:
               - dps_val: [smd, dry_clothes]
